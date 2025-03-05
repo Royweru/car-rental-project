@@ -1,0 +1,34 @@
+{% extends 'base.html'%}
+{%load static %}
+{% block content %}
+
+<div class="container mt-4">
+   <div class="grid">
+     {% for car in cars %}
+       <div class=" g-col-sm-6 g-col-md-4">
+        <div class="card h-100">
+            {% if car.image %}
+                <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.make }} {{ car.model }}">
+            {% else %}
+                <img src="{% static 'images/car1.jpeg' %}" class="card-img-top" alt="Default Car Image">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ car.make }} {{ car.model }}</h5>
+                <p class="card-text">
+                    <strong>Daily Rate:</strong> Kes{{ car.daily_rate }}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary w-100">
+                    View Details
+                </a>
+            </div>
+        </div>
+       </div>
+     {% endfor %}
+   </div>
+  </div>
+
+
+
+{% endblock %}

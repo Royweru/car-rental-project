@@ -2,72 +2,41 @@
 {% load static %}
 
 {% block content %}
-<!-- Hero Section with Booking Form -->
-<div class="hero-section" 
-   >
-    <!-- Overlay to improve text readability -->
-    <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);"></div>
-    
-    <div class="container h-100 d-flex flex-column justify-content-center">
+<div class="hero-section position-relative">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 text-center text-white" style="position: relative; z-index: 1;">
-                <h1 class="display-4 fw-bold mb-4">Premium Car Rentals</h1>
-                <p class="lead mb-5">Experience luxury and comfort with our wide range of vehicles</p>
-            </div>
-        </div>
-        
-        <!-- Booking Form Card -->
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8" style="position: relative; z-index: 1;">
-                <div class="card shadow">
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow-lg">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Book Your Car Now</h5>
+                        <h4 class="mb-0 text-center">Find Your Perfect Rental</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="#">
-                            {% csrf_token %}
+                        <form method="get" action="{% url 'search_cars' %}">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="pickup_location" class="form-label">Pickup Location</label>
-                                    <select class="form-select" id="pickup_location" name="pickup_location" required>
-                                        <option value="" selected disabled>Select location</option>
-                                        <option value="airport">Airport</option>
-                                        <option value="downtown">Downtown</option>
-                                        <option value="north">North End</option>
-                                        <option value="south">South End</option>
-                                    </select>
+                                    <label class="form-label">Pickup Location</label>
+                                    {{ form.pickup_location }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="dropoff_location" class="form-label">Drop-off Location</label>
-                                    <select class="form-select" id="dropoff_location" name="dropoff_location" required>
-                                        <option value="" selected disabled>Select location</option>
-                                        <option value="airport">Airport</option>
-                                        <option value="downtown">Downtown</option>
-                                        <option value="north">North End</option>
-                                        <option value="south">South End</option>
-                                    </select>
+                                    <label class="form-label">Drop-off Location</label>
+                                    {{ form.dropoff_location }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="pickup_date" class="form-label">Pickup Date</label>
-                                    <input type="date" class="form-control" id="pickup_date" name="pickup_date" required>
+                                    <label class="form-label">Pickup Date & Time</label>
+                                    {{ form.pickup_date }}
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="dropoff_date" class="form-label">Drop-off Date</label>
-                                    <input type="date" class="form-control" id="dropoff_date" name="dropoff_date" required>
+                                    <label class="form-label">Drop-off Date & Time</label>
+                                    {{ form.dropoff_date }}
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Car Type</label>
+                                    {{ form.car_type }}
                                 </div>
                                 <div class="col-12">
-                                    <label for="car_type" class="form-label">Car Type</label>
-                                    <select class="form-select" id="car_type" name="car_type">
-                                        <option value="any" selected>Any type</option>
-                                        <option value="economy">Economy</option>
-                                        <option value="compact">Compact</option>
-                                        <option value="midsize">Midsize</option>
-                                        <option value="suv">SUV</option>
-                                        <option value="luxury">Luxury</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100">Search Available Cars</button>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        Search Available Cars
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -78,54 +47,32 @@
     </div>
 </div>
 
-<!-- Featured Cars Section (Optional) -->
-<div class="container py-5">
-    <h2 class="text-center mb-4">Our Featured Vehicles</h2>
+<!-- Featured Cars Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Featured Cars</h2>
     <div class="row">
-        <!-- Car Card 1 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="{% static 'images/car1.jpeg' %}" class="card-img-top" alt="Luxury Sedan">
-                <div class="card-body">
-                    <h5 class="card-title">Luxury Sedan</h5>
-                    <p class="card-text">Comfort and style for business or pleasure.</p>
-                    <p class="fw-bold">$99/day</p>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="btn btn-outline-primary w-100">View Details</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Car Card 2 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="{% static 'images/car2.jpeg' %}" class="card-img-top" alt="SUV">
-                <div class="card-body">
-                    <h5 class="card-title">Premium SUV</h5>
-                    <p class="card-text">Perfect for family trips and adventures.</p>
-                    <p class="fw-bold">$129/day</p>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="btn btn-outline-primary w-100">View Details</a>
+        {% for car in featured_cars %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if car.image %}
+                        <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.make }} {{ car.model }}">
+                    {% else %}
+                        <img src="{% static 'images/car1.jpeg' %}" class="card-img-top" alt="Default Car Image">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ car.make }} {{ car.model }}</h5>
+                        <p class="card-text">
+                            <strong>Daily Rate:</strong> ${{ car.daily_rate }}
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary w-100">
+                            View Details
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Car Card 3 -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="{% static 'images/car3.jpeg' %}" class="card-img-top" alt="Sports Car">
-                <div class="card-body">
-                    <h5 class="card-title">Sports Car</h5>
-                    <p class="card-text">Experience the thrill of driving a sports car.</p>
-                    <p class="fw-bold">$199/day</p>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="btn btn-outline-primary w-100">View Details</a>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

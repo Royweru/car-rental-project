@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ car.year }} {{ car.make }} {{ car.model }} - Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Car Image and Basic Details -->
+        <div class="col-md-6">
+            {% if car.image %}
+                <img src="{{ car.image.url }}" alt="{{ car.year }} {{ car.make }} {{ car.model }}" 
+                     class="img-fluid rounded mb-4 shadow">
+            {% else %}
+                <div class="bg-light d-flex justify-content-center align-items-center rounded mb-4" style="height: 400px;">
+                    <p class="text-muted">No Image Available</p>
+                </div>
+            {% endif %}
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title mb-4">
+                        {{ car.year }} {{ car.make }} {{ car.model }}
+                    </h1>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <dl class="row">
+                                <dt class="col-6">License Plate:</dt>
+                                <dd class="col-6">{{ car.license_plate }}</dd>
+                                
+                                <dt class="col-6">Color:</dt>
+                                <dd class="col-6">{{ car.color }}</dd>
+                                
+                                <dt class="col-6">Transmission:</dt>
+                                <dd class="col-6">{{ car.get_transmission_display }}</dd>
+                            </dl>
+                        </div>
+                        
+                        <div class="col-6">
+                            <dl class="row">
+                                <dt class="col-6">Seats:</dt>
+                                <dd class="col-6">{{ car.seats }}</dd>
+                                
+                                <dt class="col-6">Daily Rate:</dt>
+                                <dd class="col-6">${{ car.daily_rate|floatformat:2 }}</dd>
+                                
+                                <dt class="col-6">Status:</dt>
+                                <dd class="col-6">
+                                    <span class="badge 
+                                        {% if car.status == 'Available' %}bg-success
+                                        {% elif car.status == 'Rented' %}bg-danger
+                                        {% else %}bg-warning
+                                        {% endif %}
+                                    ">{{ car.get_status_display }}</span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability and Booking Section -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">Availability</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for day in availability %}
+                            <div class="col text-center">
+                                <div class="p-2 rounded 
+                                    {% if day.available %}
+                                        bg-success bg-opacity-10 text-success
+                                    {% else %}
+                                        bg-danger bg-opacity-10 text-danger
+                                    {% endif %}
+                                ">
+                                    <p class="mb-0 small">{{ day.date|date:"D" }}</p>
+                                    <p class="mb-0 small">{{ day.date|date:"d M" }}</p>
+                                    <p class="mb-0 fw-bold small">
+                                        {% if day.available %}Available{% else %}Booked{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">Book This Car</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'book_car' car.id %}">
+                        {% csrf_token %}
+                    
+                        <div class="mb-3">
+                            <label for="pickup_location" class="form-label">Pickup Location</label>
+                            <select name="pickup_location" id="pickup_location" class="form-select">
+                                {% for location in locations %}
+                                    <option value="{{ location.id }}">{{ location.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="pickup_date" class="form-label">Pickup Date</label>
+                                <input type="date" name="pickup_date" id="pickup_date" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-6">
+                                <label for="dropoff_date" class="form-label">Dropoff Date</label>
+                                <input type="date" name="dropoff_date" id="dropoff_date" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            Check Availability & Book
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h2 class="h4 mb-0">Customer Reviews ({{ reviews.count }})</h2>
+        </div>
+        <div class="card-body">
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <p class="fw-bold mb-0">{{ review.user.username }}</p>
+                            <p class="text-muted small mb-0">{{ review.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="mb-2">
+                            {% for i in review.rating|rjust:"5" %}
+                                <span class="text-warning">★</span>
+                            {% endfor %}
+                            {% for i in "12345"|slice:review.rating|rjust:"5" %}
+                                <span class="text-muted">★</span>
+                            {% endfor %}
+                        </div>
+                        <p class="mb-0">{{ review.comment }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted mb-0">No reviews yet. Be the first to review this car!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pickupDateInput = document.getElementById('pickup_date');
+        const dropoffDateInput = document.getElementById('dropoff_date');
+        
+        dropoffDateInput.addEventListener('change', function() {
+            if (new Date(pickupDateInput.value) >= new Date(dropoffDateInput.value)) {
+                alert('Dropoff date must be after pickup date');
+                dropoffDateInput.value = '';
+            }
+        });
+    });
+</script>
+{% endblock %}
