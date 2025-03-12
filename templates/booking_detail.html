@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class=" container py-4">
+     <div class=" row ">
+       <div class=" col-md-6">
+        {% if booking.car.image %}
+          <img src="{{booking.car.image.url}}" 
+          alt="{{booking.car.make}}" class="img-fluid rounded w-100"/>
+          {% else %}
+          <div class=" bg-light w-100 justify-content-center align-items-center rounded"
+           style="height: 400px;"
+          >
+             <p class=" text-muted">
+             There is no car
+             </p>
+          </div>
+          {% endif %}
+          <div class=" card mt-4 p-3 shadow-sm">
+            <div class="mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="text-center">
+                    <p class="fw-bold" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Pickup Date</p>
+                    <div class="p-2 d-flex justify-content-center align-items-center bg-info rounded"><p class="fw-normal text-white">{{booking.pickup_date}}</p></div>
+                    
+                    </div>
+               
+                <div class="text-center">
+                    <p class="fw-bold" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Dropoff Date</p>
+                    <div class="p-2 d-flex justify-content-center align-items-center bg-info rounded">
+                    <p class="fw-normal text-white">{{booking.dropoff_date}}</p>
+                    </div>
+                </div>
+            </div>
+                </div>
+                
+            <div class=" mb-2">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="text-center">
+                        <p class="fw-bold" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Pickup Location</p>
+                        <div class="p-2 d-flex justify-content-center align-items-center">
+                        <p class="fw-semibold text-break" style="font-size: 16px;">{{booking.pickup_location}}</p>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="fw-bold" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">Dropoff Location</p>
+                        <div class="p-2 d-flex justify-content-center align-items-center">
+                        <p class="fw-semibold text-break" style="font-size: 16px;">{{booking.dropoff_location}}</p>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+          </div>
+       </div>
+       <div class=" col-md-6">
+         <div class=" card d-flex flex-column shadow-sm rounded p-2">
+            <h4 class=" fw-bold" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+              Booking details
+            </h4>
+            <div class=" px-3">
+                <div class="mb-1 d-flex align-items-center">
+                    <p class="me-auto" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                        Booking number: 
+                    </p>
+                    <p class=" fw-semibold text-success" style="font-size: 20px;">
+                    # {{booking.booking_number}}
+                    </p>
+                  </div>
+                  <div class="mb-1 d-flex align-items-center">
+                    <p class="me-auto" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                        Total price: 
+                    </p>
+                    <p class=" fw-semibold " style="font-size: 20px;">
+                    Kes {{booking.total_price}}
+                    </p>
+                  </div>
+
+                  <div class="mb-1 d-flex align-items-center">
+                    <p class="me-auto" style="font-family: Verdana, Geneva, Tahoma, sans-serif;">
+                       Booking status: 
+                    </p>
+                    <p class=" fw-semibold " style="font-size: 20px;">
+                     {{booking.status}}
+                    </p>
+                  </div>
+
+                
+                  
+                </div>
+              <div class=" w-100 d-flex p-3 pr-auto  bg-success 
+              align-items-center text-white justify-content-between">
+                 <p class="fw-semibold " style="font-size: medium;">
+                     Reach out , pay through mpesa
+                 </p>
+                 <p>
+                    +254 753 244 240
+                 </p>
+              </div>
+            </div>
+         
+
+         </div>
+       </div>
+     </div>
+</div>
+
+{% endblock %}

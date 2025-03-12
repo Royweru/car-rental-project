@@ -5,12 +5,12 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="row">
+    <div class="row gap-3">
         <!-- Car Image and Basic Details -->
         <div class="col-md-6">
             {% if car.image %}
                 <img src="{{ car.image.url }}" alt="{{ car.year }} {{ car.make }} {{ car.model }}" 
-                     class="img-fluid rounded mb-4 shadow">
+                     class="img-fluid rounded mb-4 shadow w-100">
             {% else %}
                 <div class="bg-light d-flex justify-content-center align-items-center rounded mb-4" style="height: 400px;">
                     <p class="text-muted">No Image Available</p>
@@ -43,7 +43,7 @@
                                 <dd class="col-6">{{ car.seats }}</dd>
                                 
                                 <dt class="col-6">Daily Rate:</dt>
-                                <dd class="col-6">${{ car.daily_rate|floatformat:2 }}</dd>
+                                <dd class="col-6">Kes{{ car.daily_rate|floatformat:2 }}</dd>
                                 
                                 <dt class="col-6">Status:</dt>
                                 <dd class="col-6">
@@ -92,38 +92,11 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h2 class="h4 mb-0">Book This Car</h2>
+                    <a href="{% url 'book_car' car.id %}" class="btn btn-primary w-100">
+                        Book This Car
+                    </a>
                 </div>
-                <div class="card-body">
-                    <form method="post" action="{% url 'book_car' car.id %}">
-                        {% csrf_token %}
-                    
-                        <div class="mb-3">
-                            <label for="pickup_location" class="form-label">Pickup Location</label>
-                            <select name="pickup_location" id="pickup_location" class="form-select">
-                                {% for location in locations %}
-                                    <option value="{{ location.id }}">{{ location.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label for="pickup_date" class="form-label">Pickup Date</label>
-                                <input type="date" name="pickup_date" id="pickup_date" class="form-control" required>
-                            </div>
-                            
-                            <div class="col-6">
-                                <label for="dropoff_date" class="form-label">Dropoff Date</label>
-                                <input type="date" name="dropoff_date" id="dropoff_date" class="form-control" required>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100">
-                            Check Availability & Book
-                        </button>
-                    </form>
-                </div>
+               
             </div>
         </div>
     </div>

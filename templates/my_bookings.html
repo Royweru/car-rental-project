@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+            <i class="fas fa-calendar-alt me-3"></i>My Bookings
+        </h2>
+        <span class="badge bg-light text-primary">
+            {% if bookings.count %}
+                {{ bookings.count }} Total Bookings
+            {% else %}
+                No Bookings
+            {% endif %}
+        </span>
+    </div>
+</div>
+<div class="card-body p-0">
+                {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Car</th>
+                                    <th>Pickup Date</th>
+                                    <th>Return Date</th>
+                                    <th>Total Cost</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                    <tr>
+                                        <td class="fw-bold">#{{ booking.id }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if booking.car.image %}
+                                                    <img src="{{ booking.car.image.url }}" 
+                                                         class="rounded me-3" 
+                                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'images/default-car.jpg' %}" 
+                                                         class="rounded me-3" 
+                                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                                {% endif %}
+                                                <span>
+                                                    {{ booking.car.make }} {{ booking.car.model }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>{{ booking.pickup_date|date:"D, M d, Y" }}</td>
+                                        <td>{{ booking.return_date|date:"D, M d, Y" }}</td>
+                                        <td class="fw-bold text-success">${{ booking.total_cost|floatformat:2 }}</td>
+                                        <td>
+                                            {% if booking.status == 'Confirmed' %}
+                                                <span class="badge bg-success">{{ booking.status }}</span>
+                                            {% elif booking.status == 'Pending' %}
+                                                <span class="badge bg-warning">{{ booking.status }}</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ booking.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'booking_detail' booking_id=booking.id %}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-car fa-4x text-muted mb-4"></i>
+                        <h3>No Bookings Yet</h3>
+                        <p class="text-muted">
+                            You haven't made any car rentals. 
+                            <a href="{% url 'car_list' %}" class="text-primary">
+                                Start exploring our cars
+                            </a>
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if bookings.count > 5 %}
+                <div class="card-footer">
+                    <nav aria-label="Bookings pagination">
+                        <ul class="pagination justify-content-center mb-0">
+                            {% if bookings.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ bookings.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in bookings.paginator.page_range %}
+                                <li class="page-item {% if num == bookings.number %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+                            
+                            {% if bookings.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ bookings.next_page_number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+        transition: background-color 0.3s ease;
+    }
+</style>
+{% endblock %}

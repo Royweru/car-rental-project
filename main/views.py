@@ -1,7 +1,7 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -13,13 +13,13 @@ from django.urls import reverse_lazy
 from django.views import generic
 from .models import Car, Location, Booking, Review
 
-from .forms import BookingForm,SearchForm
+from .forms import BookingForm,CarSearchForm
 # Create your views here.
 
 def index(request):
     """Home page view with featured cars and search form"""
     featured_cars = Car.objects.filter(is_featured=True, status='Available')[:3]
-    form = SearchForm()
+    form =CarSearchForm()
     
     context = {
         'featured_cars': featured_cars,
@@ -67,21 +67,34 @@ def car_list(request):
     return render(request, 'car_list.html', context)
 
 
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'You have been logged out successfully.')
+    return redirect('home')
+
 def login_view(request) :
+    # if user is authenticated then they should not access this login page
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method =='POST' :
         username = request.POST.get('username')
         password = request.POST.get('password')
         
         user = authenticate(request, username = username, password = password)
-        
-        if user not in None :
+        if user is not None :
             login(request,user)
             return redirect('home')
-        
+  
         else:
-            return messages.success(request,"Invalid login credentials, either your username or password is incorrect")
+            messages.error(request,"Invalid login credentials, either your username or password is incorrect")
+            return render(request,'auth/login.html')
     return render(request,'auth/login.html')
 def register_view(request):
+    if request.user.is_authenticated :
+        return redirect('home')
+    
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -124,20 +137,44 @@ def car_detail(request, car_id):
 
 def search_cars(request):
     """Search for available cars based on form input"""
-    if request.method == 'POST':
-        pickup_location = request.POST.get('pickup_location')
-        dropoff_location = request.POST.get('dropoff_location')
-        pickup_date = request.POST.get('pickup_date')
-        dropoff_date = request.POST.get('dropoff_date')
-        car_type = request.POST.get('car_type', 'any')
+    form = CarSearchForm(request.GET)
+    
+    if form.is_valid():
+        # Get cleaned form data
+        make = form.cleaned_data.get('make')
+        model = form.cleaned_data.get('model')
+        transmission = form.cleaned_data.get('transmission')
+        seats = form.cleaned_data.get('seats')
+        min_price = form.cleaned_data.get('min_price')
+        max_price = form.cleaned_data.get('max_price')
         
-        # Build query parameters for car list
-        query_params = f"?pickup_location={pickup_location}&dropoff_location={dropoff_location}"
-        query_params += f"&pickup_date={pickup_date}&dropoff_date={dropoff_date}"
-        if car_type != 'any':
-            query_params += f"&car_type={car_type}"
-            
-        return redirect(f'/cars/{query_params}')
+        # Start with base queryset of available cars
+        cars = Car.objects.all()
+        
+        # Apply filters based on form input
+        if make:
+            cars = cars.filter(make__icontains=make)
+        
+        if model:
+            cars = cars.filter(model__icontains=model)
+        
+        if transmission:
+            cars = cars.filter(transmission=transmission)
+        
+        if seats:
+            cars = cars.filter(seats=seats)
+        
+        if min_price:
+            cars = cars.filter(daily_rate__gte=min_price)
+        
+        if max_price:
+            cars = cars.filter(daily_rate__lte=max_price)
+        
+        # Render search results page
+        return render(request, 'cars/search_results.html', {
+            'cars': cars,
+            'form': form
+        })
     
     # If GET request, just redirect to car list
     return redirect('car_list')
@@ -209,14 +246,26 @@ def book_car(request, car_id):
 
 @login_required
 def my_bookings(request):
-    """View all bookings for the current user"""
-    bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
+    """View all bookings for the current user with pagination"""
+    bookings_list = Booking.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(bookings_list, 5)  # Show 5 bookings per page
+    page = request.GET.get('page', 1)
+    
+    try:
+        bookings = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        bookings = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range, deliver last page of results
+        bookings = paginator.page(paginator.num_pages)
     
     context = {
         'bookings': bookings,
     }
     return render(request, 'my_bookings.html', context)
-
 @login_required
 def booking_detail(request, booking_id):
     """View details of a specific booking"""

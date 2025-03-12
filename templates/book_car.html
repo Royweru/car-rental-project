@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Book {{ car.year }} {{ car.make }} {{ car.model }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">Book {{ car.year }} {{ car.make }} {{ car.model }}</h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {% if car.image %}
+                                <img src="{{ car.image.url }}" alt="{{ car.year }} {{ car.make }} {{ car.model }}" 
+                                     class="img-fluid rounded shadow">
+                            {% else %}
+                                <div class="bg-light d-flex justify-content-center align-items-center rounded" style="height: 200px;">
+                                    <p class="text-muted">No Image Available</p>
+                                </div>
+                            {% endif %}
+                            <div class="mt-3">
+                                <p class="mb-1"><strong>Daily Rate:</strong> ${{ car.daily_rate|floatformat:2 }}</p>
+                                <p class="mb-1"><strong>Seats:</strong> {{ car.seats }}</p>
+                                <p class="mb-1"><strong>Transmission:</strong> {{ car.get_transmission_display }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.pickup_location|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.dropoff_location|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.pickup_date|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.dropoff_date|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div id="price-summary" class="alert alert-info d-none">
+                                    <h5>Booking Summary</h5>
+                                    <p>Total Days: <span id="total-days">0</span></p>
+                                    <p>Total Price: $<span id="total-price">0.00</span></p>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Confirm Booking
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pickupDateInput = document.getElementById('id_pickup_date');
+        const dropoffDateInput = document.getElementById('id_dropoff_date');
+        const priceSummary = document.getElementById('price-summary');
+        const totalDaysSpan = document.getElementById('total-days');
+        const totalPriceSpan = document.getElementById('total-price');
+        const dailyRate = {{ car.daily_rate|safe }};
+
+        const today = new Date().toISOString().split('T')[0];
+        pickupDateInput.setAttribute('min', today);
+        dropoffDateInput.setAttribute('min', today);
+
+        function calculatePriceSummary() {
+            const pickupDate = new Date(pickupDateInput.value);
+            const dropoffDate = new Date(dropoffDateInput.value);
+
+            if (isNaN(pickupDate.getTime()) || isNaN(dropoffDate.getTime())) {
+                totalDaysSpan.textContent = "Please select valid dates.";
+                totalPriceSpan.textContent = "";
+                return;
+            }
+
+            const timeDiff = dropoffDate.getTime() - pickupDate.getTime();
+            const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+            if (totalDays < 0) {
+                totalDaysSpan.textContent = "Drop-off date must be after pickup date.";
+                totalPriceSpan.textContent = "";
+                return;
+            }
+
+            const totalPrice = totalDays * dailyRate;
+
+            totalDaysSpan.textContent = totalDays;
+            totalPriceSpan.textContent = totalPrice.toFixed(2);
+        }
+
+        pickupDateInput.addEventListener('change', calculatePriceSummary);
+        dropoffDateInput.addEventListener('change', calculatePriceSummary);
+    });
+</script>
+{% endblock %}

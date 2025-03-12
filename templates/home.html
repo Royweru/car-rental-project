@@ -2,71 +2,87 @@
 {% load static %}
 
 {% block content %}
-<div class="hero-section position-relative">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <div class="card shadow-lg">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0 text-center">Find Your Perfect Rental</h4>
-                    </div>
-                    <div class="card-body">
-                        <form method="get" action="{% url 'search_cars' %}">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Pickup Location</label>
-                                    {{ form.pickup_location }}
+<div class="container-fluid p-0">
+    <!-- Hero Section -->
+    <div class="hero-section position-relative bg-light py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 mb-4">Discover Your Perfect Ride</h1>
+                    <p class="lead text-muted mb-4">
+                        Find the ideal car for your journey with our extensive selection 
+                        of high-quality rental vehicles.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4">
+                            <h3 class="card-title text-center mb-4">Car Search</h3>
+                            <form method="get" action="{% url 'search_cars' %}">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Car Make</label>
+                                        {{ form.make }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Car Model</label>
+                                        {{ form.model }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Transmission</label>
+                                        {{ form.transmission }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Seats</label>
+                                        {{ form.seats }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Min Daily Rate</label>
+                                        {{ form.min_price }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Max Daily Rate</label>
+                                        {{ form.max_price }}
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary w-100 mt-3">
+                                            Search Cars
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Drop-off Location</label>
-                                    {{ form.dropoff_location }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Pickup Date & Time</label>
-                                    {{ form.pickup_date }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Drop-off Date & Time</label>
-                                    {{ form.dropoff_date }}
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label">Car Type</label>
-                                    {{ form.car_type }}
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        Search Available Cars
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
 <!-- Featured Cars Section -->
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Featured Cars</h2>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="mb-3">Featured Cars</h2>
+        <p class="text-muted">Explore our top recommended vehicles</p>
+    </div>
     <div class="row">
         {% for car in featured_cars %}
             <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    {% if car.image %}
-                        <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.make }} {{ car.model }}">
-                    {% else %}
-                        <img src="{% static 'images/car1.jpeg' %}" class="card-img-top" alt="Default Car Image">
-                    {% endif %}
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-img-top overflow-hidden">
+                        {% if car.image %}
+                            <img src="{{ car.image.url }}" class="img-fluid w-100" style="object-fit: cover; height: 250px;" alt="{{ car.make }} {{ car.model }}">
+                        {% else %}
+                            <img src="{% static 'images/default-car.jpg' %}" class="img-fluid w-100" style="object-fit: cover; height: 250px;" alt="Default Car Image">
+                        {% endif %}
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ car.make }} {{ car.model }}</h5>
-                        <p class="card-text">
-                            <strong>Daily Rate:</strong> ${{ car.daily_rate }}
-                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h6 mb-0">Kes {{ car.daily_rate }}/day</span>
+                            <span class="badge bg-primary">{{ car.transmission }}</span>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary w-100">
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-outline-primary w-100">
                             View Details
                         </a>
                     </div>
@@ -74,5 +90,39 @@
             </div>
         {% endfor %}
     </div>
+</div>
+
+<!-- Why Choose Us Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="mb-3">Why Rent With Us</h2>
+            <p class="text-muted">We make your car rental experience seamless and enjoyable</p>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="p-4">
+                    <i class="fas fa-car fa-3x mb-3 text-primary"></i>
+                    <h4>Wide Selection</h4>
+                    <p class="text-muted">Choose from a diverse fleet of well-maintained vehicles.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4">
+                    <i class="fas fa-tags fa-3x mb-3 text-primary"></i>
+                    <h4>Competitive Pricing</h4>
+                    <p class="text-muted">Affordable rates without compromising on quality.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="p-4">
+                    <i class="fas fa-headset fa-3x mb-3 text-primary"></i>
+                    <h4>24/7 Support</h4>
+                    <p class="text-muted">Our customer support team is always ready to help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 {% endblock %}

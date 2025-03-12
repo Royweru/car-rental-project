@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Search Results</h2>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <form method="get" action="{% url 'search_cars' %}">
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Refine Search</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% if cars %}
+            {% for car in cars %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if car.image %}
+                            <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.make }} {{ car.model }}">
+                        {% else %}
+                            <img src="{% static 'images/car1.jpeg' %}" class="card-img-top" alt="Default Car Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ car.make }} {{ car.model }}</h5>
+                            <p class="card-text">
+                                <strong>Transmission:</strong> {{ car.transmission }}<br>
+                                <strong>Seats:</strong> {{ car.seats }}<br>
+                                <strong>Daily Rate:</strong> ${{ car.daily_rate }}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'car_detail' car_id=car.id %}" class="btn btn-primary w-100">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <p class="text-center">No cars found matching your search criteria.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="container mt-4">
-   <div class="grid">
+   <div class="row">
      {% for car in cars %}
-       <div class=" g-col-sm-6 g-col-md-4">
+       <div class=" col-sm-6 col-md-4">
         <div class="card h-100">
             {% if car.image %}
                 <img src="{{ car.image.url }}" class="card-img-top" alt="{{ car.make }} {{ car.model }}">
