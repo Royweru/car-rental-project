@@ -261,9 +261,11 @@ def my_bookings(request):
     except EmptyPage:
         # If page is out of range, deliver last page of results
         bookings = paginator.page(paginator.num_pages)
+    bookings_count = len(bookings_list)
     
     context = {
         'bookings': bookings,
+        'bookings_count':bookings_count
     }
     return render(request, 'my_bookings.html', context)
 @login_required

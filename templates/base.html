@@ -32,22 +32,12 @@
     <!-- Spacer to prevent content from being hidden under fixed navbar -->
     <div style="height: 56px;"></div>
     {% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-          <strong class="me-auto">Booking system</strong>
-          <small class="text-body-secondary" data-timestamp="{{ message.extra_tags }}">Just now</small>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-         {{ message }}
-        </div>
-      </div>
-    {% endfor %}
-</ul>
-
-{% endif %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <!-- Main Content -->
     {% block content %}{% endblock %}
     
