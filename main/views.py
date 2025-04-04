@@ -10,7 +10,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
-from django.views import generic
+
 from .models import Car, Location, Booking, Review
 
 from .forms import BookingForm,CarSearchForm
