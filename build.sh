@@ -1,5 +1,5 @@
-set -o errexit #exit on error
+set -o errexit  #Exit on error
 
 pip install -r requirements.txt
-pip manage.py collectstatic --noinput
-pip manage.py migrate
+python manage.py collectstatic --no-input
+python manage.py migrate
