@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["car-rentals-cbb5.onrender.com"]
+ALLOWED_HOSTS = ["car-rentals-cbb5.onrender.com",'127.0.0.1']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -85,8 +85,11 @@ DATABASES = {
 }
 
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 # Password validation
